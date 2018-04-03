@@ -1,16 +1,16 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
-import Task from '@/components/Task'
+import Home from '@/components/Home'
 
-Vue.use(Vue)
+Vue.use(Router)
 
 export default new Router({
   routes: [
     {
       path: '/',
-      name: 'Task',
-      component: Task
+      name: 'Home',
+      component: Home
     }
   ]
 })
