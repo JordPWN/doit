@@ -9,7 +9,7 @@
       <p>
         {{ task.description }}
       </p>
-      <task v-for='subtask in task.subtasks' :key='subtask.id' :task='subtask'/>
+      <task v-if='loaded()' v-for='subtask in task.subtasks' :key='subtask.id' :task='findTask(subtask)'/>
       <div class='task-controls'>
         <div class='add-subtask' @click='addSubtask'>
           ⨁ Add Subtask
@@ -22,11 +22,12 @@
   </div>
 </template>
 <script>
-const blankTask = {
-  label: 'Made from scratch.',
-  done: false,
-  parentId: this.task.id
-}
+import get from 'lodash/fp/get'
+// const blankTask = {
+//   label: 'Made from scratch.',
+//   done: false,
+//   parentId: this.task.id
+// }
 export default {
   name: 'Task',
   props: ['task'],
@@ -34,11 +35,26 @@ export default {
     addSubtask () {
       this.subtask.push()
     },
+    loaded () {
+      get('subtasks')(this.task)
+    },
     toggleDone () {
       this.task.done = !this.task.done
     },
     toggleShow () {
       this.shrunk = !this.shrunk
+    }
+  },
+  computed: {
+    subtasks () {
+      // console.log('subtask: ', this.$store.state.tasks)
+      return this.$store.state.tasks.filter(subtask => {
+        return this.task.id = subtask.id
+      })
+      // return this.$store.state.tasks.find(subtask => {
+      //   console.log('subtask: ', subtask)
+      //   return subtask.id.some(this.task.subtasks)
+      // })
     }
   },
   data () {
@@ -49,6 +65,18 @@ export default {
 }
 </script>
 <style lang='scss' scoped>
+@keyframes anim {
+  0% {
+    display: none;
+  }
+  1% {
+    display: flex;
+    transform: scaleY(0);
+  }
+  100% {
+    transform: scaleY(1);
+  }
+}
 .task-container {
   display: flex;
   flex-direction: column;
@@ -56,8 +84,11 @@ export default {
   border: 1em solid grey;
   padding: 1em;
   .task-content {
+    max-height: 100%;
+    animation: anim .1s ease-in-out;
     &.shrunk {
-      height: 0em;
+      display: none;
+      max-height: 0em;
       overflow: hidden;
     }
   }
