@@ -9,7 +9,7 @@
       <p>
         {{ task.description }}
       </p>
-      <task v-if='loaded()' v-for='subtask in task.subtasks' :key='subtask.id' :task='findTask(subtask)'/>
+      <task v-if='subtasks' v-for='subtask in subtasks' :key='subtask.id' :task='subtask'/>
       <div class='task-controls'>
         <div class='add-subtask' @click='addSubtask'>
           ⨁ Add Subtask
@@ -35,26 +35,28 @@ export default {
     addSubtask () {
       this.subtask.push()
     },
-    loaded () {
-      get('subtasks')(this.task)
-    },
     toggleDone () {
       this.task.done = !this.task.done
     },
     toggleShow () {
       this.shrunk = !this.shrunk
+    },
+    findTaskById (taskId) {
+      return get('tasks')(this.$store.state).find(task => taskId === task.id)
+    },
+    filterTasks (tasks) {
+      const results = []
+      tasks.filter(task => {
+        const found = this.findTaskById(task)
+        console.log('found: ', found)
+        if (found) results.push(found)
+      })
+      return results
     }
   },
   computed: {
     subtasks () {
-      // console.log('subtask: ', this.$store.state.tasks)
-      return this.$store.state.tasks.filter(subtask => {
-        return this.task.id = subtask.id
-      })
-      // return this.$store.state.tasks.find(subtask => {
-      //   console.log('subtask: ', subtask)
-      //   return subtask.id.some(this.task.subtasks)
-      // })
+      if (this.task.subtasks) return this.filterTasks(this.task.subtasks)
     }
   },
   data () {
