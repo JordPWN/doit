@@ -1,6 +1,6 @@
 <template>
   <div class='tasklist-container'>
-    <task :task='task[0]' />
+    <task :task='task' />
   </div>
 </template>
 <script>
@@ -15,7 +15,7 @@ export default {
   },
   computed: {
     task () {
-      return get('tasks')(this.$store.state)
+      return get('tasks')(this.$store.state)[1]
     }
   }
 }
